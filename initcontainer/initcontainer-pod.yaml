@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: laravel-app
+  labels:
+    app: laravel
+spec:
+  serviceAccountName: laravel-app-sa
+  volumes:
+    - name: env-file-volume
+      emptyDir: {}
+  initContainers:
+    - name: fetch-env
+      image: amazon/aws-cli:latest
+      env:
+        - name: AWS_REGION
+          value: "us-east-1" # Replace with your region
+        - name: SECRET_NAME
+          value: "my-laravel-env-secret" # Replace with your secret name
+      command:
+        - /bin/sh
+        - -c
+        - |
+          echo "Fetching .env file from AWS Secrets Manager..."
+          aws secretsmanager get-secret-value --region $AWS_REGION --secret-id $SECRET_NAME --query SecretString --output text > /env/.env
+      volumeMounts:
+        - name: env-file-volume
+          mountPath: /env
+  containers:
+    - name: laravel-app
+      image: my-laravel-app:latest
+      ports:
+        - containerPort: 80
+      volumeMounts:
+        - name: env-file-volume
+          mountPath: /var/www/html/.env
+          subPath: .env
+      env:
+        - name: APP_ENV
+          value: "production" # Example of an additional environment variable
+
+  # Define the service account with AWS Secrets Manager permissions
+  restartPolicy: Always

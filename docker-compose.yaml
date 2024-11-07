@@ -1,0 +1,42 @@
+version: '3.3'
+
+services:
+  mysql:
+    image: mysql:debian
+    container_name: mysql
+    networks:
+      - mynet
+    environment:
+      MYSQL_ROOT_PASSWORD: helloadmin@123
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD: wpuser@123
+    volumes:
+      - mysql_vol:/var/lib/mysql
+    restart: always
+
+  wordpress:
+    image: wordpress:latest
+    container_name: wordpress
+    depends_on:
+      - mysql
+    networks:
+      - mynet
+    ports:
+      - "80:80"
+    environment:
+      WORDPRESS_DB_HOST: mysql
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: wpuser@123
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wordpress_vol:/var/www/html
+    restart: always
+
+networks:
+  mynet:
+    driver: bridge
+
+volumes:
+  mysql_vol:
+  wordpress_vol:

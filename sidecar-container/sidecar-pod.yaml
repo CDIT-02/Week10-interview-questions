@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: laravel-with-logger
+  labels:
+    app: laravel
+spec:
+  volumes:
+    - name: log-volume
+      emptyDir: {}
+
+  containers:
+    # Main Laravel Application Container
+    - name: laravel-app
+      image: my-laravel-app:latest
+      ports:
+        - containerPort: 80
+      volumeMounts:
+        - name: log-volume
+          mountPath: /var/www/html/storage/logs
+      env:
+        - name: APP_ENV
+          value: "production"
+      command:
+        - /bin/sh
+        - -c
+        - |
+          echo "Starting Laravel application..."
+          php artisan serve --host=0.0.0.0 --port=80
+
+    # Sidecar Container for Log Streaming
+    - name: log-forwarder
+      image: fluent/fluent-bit:latest
+      volumeMounts:
+        - name: log-volume
+          mountPath: /logs
+      env:
+        - name: FLUENT_ELASTICSEARCH_HOST
+          value: "elasticsearch.example.com" # Replace with your Elasticsearch host
+        - name: FLUENT_ELASTICSEARCH_PORT
+          value: "9200" # Replace with your Elasticsearch port
+      command:
+        - /fluent-bit/bin/fluent-bit
+        - -i
+        - tail
+        - -p
+        - path=/logs/laravel.log
+        - -p
+        - read_from_head=true
+        - -o
+        - es
+        - -p
+        - Host=${FLUENT_ELASTICSEARCH_HOST}
+        - -p
+        - Port=${FLUENT_ELASTICSEARCH_PORT}
+
+  restartPolicy: Always
