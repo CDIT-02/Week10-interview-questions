@@ -15,8 +15,10 @@ WORKDIR /app
 # Copy the current directory contents into the container at /app
 COPY . /app
 
-# Expose port 5000
-EXPOSE 5000
 
-# Set a default command
+COPY indx.html .
+
+# Expose port 5000
+EXPOSE 5000 
+
 CMD ["python", "app.py"]

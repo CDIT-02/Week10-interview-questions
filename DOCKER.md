@@ -1,9 +1,9 @@
 1. Difference between a container and a Virtual machine
-    Container - Isolated process
+    Container - Isolated process - cgroups - set resource isolation and namespaces is network isolation
     VM - Entire OS 
 
 2. Difference between Registry vs repository?
-    registries: docker.io, ECR, ghr
+    registries: docker.io, ECR, ghr, github
     repository: Custom name like httpd, mysqld
 
 3. Docker data directory? /var/lib/docker/{volumes,containers, networks}
@@ -14,7 +14,7 @@
     docker image ls
     docker tag <new_image_name>:<tag> <new_image_name>:<new_tag>
 
-5. how do you copy an image from one machine to another without using internet?
+5. how do you copy an image from one machine to another without using internet? - Do it
     docker save -o /tmp/my-image.tar my-image:latest
     scp /tmp/my-image.tar user@destination_machine:/path/to/destination or rsync
     docker load -i /tmp/my-image.tar
@@ -34,11 +34,11 @@
     Dynamic data storage in volumes
     argument: -v 
 
-docker volume create mysql_vol
-docker network create --driver bridge mynet
-docker container run --name mysql -d --network mynet -e MYSQL_ROOT_PASSWORD="helloadmin@123" -e MYSQL_DATABASE="wordpress" -e MYSQL_USER="wp_user" -e MYSQL_PASSWORD="wpuser@123" -v mysql_vol:/var/lib/mysql/ mysql:debian
+docker volume create mysql_vol_1
+docker network create --driver bridge mynet-1
+docker container run --name mysql -d --network mynet-1 -e MYSQL_ROOT_PASSWORD="helloadmin@123" -e MYSQL_DATABASE="wordpress" -e MYSQL_USER="wp_user" -e MYSQL_PASSWORD="wpuser@123" -v mysql_vol_1:/var/lib/mysql/ mysql:debian
 docker volume create wordpress_vol
-docker container run --name wordpress -d -p 80:80 --network mynet -e WORDPRESS_DB_HOST="mysql" -e WORDPRESS_DB_USER="wp_user" -e WORDPRESS_DB_PASSWORD="wpuser@123" -e WORDPRESS_DB_NAME="wordpress" -v wordpress_vol:/var/www/html/ wordpress:latest
+docker container run --name wordpress -d -p 80:80 --network mynet-1 -e WORDPRESS_DB_HOST="mysql" -e WORDPRESS_DB_USER="wp_user" -e WORDPRESS_DB_PASSWORD="wpuser@123" -e WORDPRESS_DB_NAME="wordpress" -v wordpress_vol_1:/var/www/html/ wordpress:latest
 
 10. Docker volume vs bind mount
         volumes - secure way - no permission issue
@@ -59,8 +59,8 @@ docker container run --name nginx1 -d -p 8081:80 -v /opt/test:/usr/share/nginx/h
         FROM
         COPY
         ADD
-        RUN
-        WORKDIR
+        RUN 
+        WORKDIR /opt
         ENV - pass when starting container for the application
         ARG - pass when building container image
         USER
@@ -73,6 +73,14 @@ docker container run --name nginx1 -d -p 8081:80 -v /opt/test:/usr/share/nginx/h
 16. Difference between ADD and COPY
 17. Dangling images ? images without tag
 18. Docker system prune
+
 19. What is docker-compose ? Check a sample docker-compose file - services, networks, volumes
         docker-compose up -d
         docker-compose down
+
+20. What are the best practises to create minimal size images?
+        Always use alpine, bottlerocket kind of light weight based images
+        RUN command include all instructions in a single line
+        COPY only what is necessary
+        When installing additional programs, use apk add --no-cache
+        Use multistage build

@@ -17,9 +17,17 @@ Pods
         kubectl logs myapp-pod -c init-mydb      # Inspect the second init container
 
 
-    3. Sidecars container?
+    3. Sidecars containers?
         A sidecar container in Kubernetes is like a motorcycle's sidecar, running alongside the main container to add features without changing the main app like fluentd or logstash
-            eg:
+            eg: Check sidecar-container
+
+    4. How do you allocate resources for a pod?
+
+    5. What is livenessProbe, readinessProbe, and startupProbe
+        livenessProbe: healthcheck in asg, Checks if a container is still running.
+        readinessProbe: Ensures app only gets traffic when ready
+        startupProbe: Checks if a container has successfully started.
+        check pod.yaml file
 
 Pod Storage:
     emptyDir - Bound to a pod
@@ -64,7 +72,9 @@ Deployments:
     Deployments strategies
         Rolling update(default)
         Recreate
-    How to rollback to a specific version?
+    How to rollback to a specific version? 
+        kubectl rollout history deployment/nginx-deployment
+        kubectl rollout undo deployment/nginx-deployment --to-revision=2
     What other deployment strategies you know ? 
         blue green
         canary
@@ -74,11 +84,11 @@ Difference between configMap and secrets?
 Services:
     ClusterIP
     Nodeport
-    Load balancer
-    Ingress
+    Load balancer - Exposes a single service externally	, Directly forwards to one service
+    Ingress - Exposes multiple services with routing rules, Routes based on URL path, hostname, etc.
 
-
-
+LoadBalancer is best when you need quick, direct access to a single service and have simple networking requirements.
+Ingress is more suitable when you need to manage traffic for multiple services, especially if you require custom routing rules, SSL termination, or if you want to avoid creating multiple load balancers.
 
 
 General Questions:-

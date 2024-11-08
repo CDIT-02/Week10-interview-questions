@@ -29,6 +29,13 @@ spec:
   containers:
     - name: laravel-app
       image: my-laravel-app:latest
+      resources:
+      requests:
+        memory: "128Mi"  # The amount of memory Kubernetes will guarantee to this container
+        cpu: "250m"      # The amount of CPU Kubernetes will guarantee to this container 1000m= 1cpu
+      limits:
+        memory: "256Mi"  # The maximum memory the container can use
+        cpu: "500m"      # The maximum CPU the container can use
       ports:
         - containerPort: 80
       volumeMounts:
