@@ -4,6 +4,9 @@ Pods
         kubectl exec -n <ns> -it pod-name /bin/bash
         kubectl exec -it my-pod -c nginx-container -- /bin/sh
         kubectl exec -it my-pod -c helper-container -- /bin/sh
+
+
+        kubectl exec my-pod -c nginx -- ls /var/www/html/
         
     2. Init container?
             Init Containers are containers that are part of a pod. They start and run to completion before the main containers in the pod begin.
@@ -78,6 +81,7 @@ Deployments:
     What other deployment strategies you know ? 
         blue green
         canary
+        A/B testing
 
 Difference between configMap and secrets?
 
